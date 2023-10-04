@@ -1,0 +1,26 @@
+# Node-specific
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Distribution / packaging
+dist/
+build/
+
+# Logs
+*.log
+
+# IDEs
+.vscode/
+.idea/
+
+# OS generated
+.DS_Store
+
+# Environment variables
+.env
+
+# Other
+*.swp
+*.swo
+.git/

@@ -1,0 +1,25 @@
+# Node-specific
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# Build and dist
+dist/
+build/
+
+# Logs
+*.log
+
+# IDEs and Editors
+.vscode/
+.idea/
+.DS_Store
+
+# Environment variables
+.env
+
+# Other
+*.swp
+*.swo
