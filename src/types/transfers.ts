@@ -4,9 +4,11 @@ export const Transfer = y.object({
   id: y.string().required(),
   timestamp: y.date().required(),
   amount: y.number().required(),
-  status: y.string(),
-  source_account_id: y.string(),
-  dest_account_id: y.string()
+  status: y.string().required(),
+  source_customer_name: y.string().required(),
+  source_account_id: y.string().required(),
+  destination_customer_name: y.string().required(),
+  dest_account_id: y.string().required()
 })
 
 export type TTransfer = y.InferType<typeof Transfer>

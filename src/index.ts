@@ -1,11 +1,13 @@
+import path from 'path'
+
+import autoLoad from '@fastify/autoload'
 import Fastify, { type FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
 // import fastifySqlite from 'fastify-sqlite'
 // import { fastifyYupSchema } from 'fastify-yup-schema'
 import { yupPlugin } from 'fastify-type-provider-yup'
-import path from 'path'
+import { fastifyYupSchema } from 'fastify-yup-schema'
 import sqlite3 from 'sqlite3'
-import autoLoad from '@fastify/autoload'
 
 const server: FastifyInstance = Fastify({
   logger: true,
@@ -62,7 +64,8 @@ const initDatabase = async (db: sqlite3.Database): Promise<void> => {
 }
 
 const start: () => Promise<void> = async (): Promise<void> => {
-  await server.register(fp(yupPlugin))
+  // await server.register(fp(yupPlugin))
+  await server.register(fastifyYupSchema)
   await server.register(autoLoad, {
     dir: path.join(__dirname, 'routes'),
     options: {}

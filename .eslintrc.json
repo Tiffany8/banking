@@ -14,6 +14,21 @@
     },
     "plugins": ["@typescript-eslint"],
     "rules": {
+        "import/order": [
+      "error",
+        {
+            "alphabetize": { "order": "asc" },
+            "groups": [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index"
+            ],
+            "newlines-between": "always"
+        }
+    ]
     },
     "ignorePatterns": ["jest.config.ts"]
 }
