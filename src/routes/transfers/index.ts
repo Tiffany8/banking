@@ -4,9 +4,10 @@ import {
   validatorCompiler,
   type YupTypeProvider
 } from 'fastify-type-provider-yup'
+import * as y from 'yup'
 
 import transferlib from '../../lib/transfersLib'
-import { type TTransfer } from '../../types/transfers'
+import { Transfer, type TTransfer } from '../../types/transfers'
 
 import {
   GetTransferByIdRequestParams,
@@ -30,7 +31,10 @@ export default async (
     '/',
     {
       schema: {
-        querystring: GetTransfersRequestParams
+        querystring: GetTransfersRequestParams,
+        response: {
+          200: y.array().of(Transfer)
+        }
       }
     },
     async (request, reply) => {
@@ -50,7 +54,10 @@ export default async (
     '/:id',
     {
       schema: {
-        params: GetTransferByIdRequestParams
+        params: GetTransferByIdRequestParams,
+        response: {
+          200: Transfer
+        }
       }
     },
     async (request, reply) => {
