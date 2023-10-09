@@ -45,7 +45,7 @@ describe('accounts endpoint', () => {
       method: 'POST',
       url: '/accounts',
       body: {
-        customer_id: 1234,
+        customer_id: '1234',
         account_number: '123456789',
         routing_number: validRoutingNumber
       }
@@ -61,7 +61,7 @@ describe('accounts endpoint', () => {
       method: 'POST',
       url: '/accounts',
       body: {
-        customer_id: 1,
+        customer_id: customer.id,
         account_number: '123456789',
         routing_number: '123456789'
       }

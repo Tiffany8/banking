@@ -1,1 +1,1 @@
-export type TResource<T = { id: number }> = T
+export type TResource<T = { id: string }> = T

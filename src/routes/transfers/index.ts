@@ -4,7 +4,6 @@ import {
   validatorCompiler,
   type YupTypeProvider
 } from 'fastify-type-provider-yup'
-import * as y from 'yup'
 
 import transferlib from '../../lib/transfersLib'
 import { Transfer, type TTransfer } from '../../types/transfers'
@@ -31,14 +30,13 @@ export default async (
     '/',
     {
       schema: {
-        querystring: GetTransfersRequestParams,
-        response: {
-          200: y.array().of(Transfer)
-        }
+        querystring: GetTransfersRequestParams
       }
     },
     async (request, reply) => {
       const { limit, offset } = request.query
+      console.log('offset ', offset)
+      console.log('limit ', limit)
       const transfers = await transferlib.getTransfers({
         db: fastify.db,
         limit,

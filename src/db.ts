@@ -3,21 +3,21 @@ import type sqlite3 from 'sqlite3'
 export const initDatabase = async (db: sqlite3.Database): Promise<void> => {
   const queries: string[] = [
     `CREATE TABLE IF NOT EXISTS customers (
-      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      id TEXT NOT NULL PRIMARY KEY,
       first_name TEXT,
       last_name TEXT,
       date_of_birth DATE,
       email TEXT
     );`,
     `CREATE TABLE IF NOT EXISTS accounts (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        id TEXT NOT NULL PRIMARY KEY,
         customer_id INTEGER NOT NULL,
         routing_number TEXT,
         account_number TEXT,
         FOREIGN KEY (customer_id) REFERENCES customers(id)
     );`,
     `CREATE TABLE IF NOT EXISTS transfers (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        id TEXT NOT NULL PRIMARY KEY,
         timestamp DATETIME NOT NULL,
         amount INTEGER NOT NULL,
         status TEXT NOT NULL,

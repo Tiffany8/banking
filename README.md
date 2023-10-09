@@ -17,7 +17,18 @@
     docker-compose up --build app
     ```
 
-3. Access the server at [http://localhost:8080](http://localhost:8080)
+3. Access the server via [http://localhost:8080](http://localhost:8080).  See [API Documentation](#api-documentation) for more help; but for commandline access, I like to use [http](www.httpie.com)
+  ```bash
+  http localhost:8080/transfers
+  ```
+
+  ```bash
+  http localhost:8080/transfers/${ID}
+  ```
+
+  ```bash
+  http --json POST localhost:8080/accounts customer_id=${customer_id} account_number=${account_number} routing_number=${valid_routing_number} 
+  ```
 
 ### Running the Tests:
 1. Execute tests:
@@ -27,7 +38,7 @@
 
 ## API Documentation
 
-Access Swagger documentation with example requests at [http://localhost:8080/documentation](http://localhost:8080/documentation) when the server is running.
+Access Swagger documentation at [http://localhost:8080/docs](http://localhost:8080/docs) when the server is running.
 
 ## Pain Points/Frustrations:
 
@@ -35,13 +46,16 @@ Access Swagger documentation with example requests at [http://localhost:8080/doc
    - Lack of native async/await support led to verbose code while wrapping SQLite's callback-based API in Promises.
    - Adapting to SQLite-specific SQL syntax and conventions posed challenges, especially the absence of common SQL functions like CONCAT.
    - The mix of synchronous and asynchronous methods added complexity, especially when integrating with an asynchronous environment like Fastify.
+   - Lack of built-in UUID data type, however, it is flexible enough to allow for the storage of UUIDs, so overall, code would be more verbose because UUIDs need to be generated in the application code
+   - In the application, I realized later that the ids in the seed data were actually uuids. I created the table ids as autoincrementing integers. 
 
 - **Error Handling**: 
    - Floating promises led to unhandled promise rejections, complicating debugging.
 
 - **Schema Validation**:
    - I'd used Zod previously and recall having some difficulties with it, so was curious about Yup for schema validation. I found Yup less minimalist. Sparse documentation on integrating `fastify-yup-swagger` posed challenges, but I stumbled upon recent `fastify-type-provider` for [Yup](https://github.com/jorgevrgs/fastify-type-provider-yup) that simplified the Swagger setup. Considering exploring Typebox next.
-        - Note -- encountered a limitation where the library doesn't support accurate representation of arrays of specific object schemas (see /transfers endpoint schema)
+        - Encountered a limitation where the library doesn't support accurate representation of arrays of specific object schemas (see /transfers endpoint schema)
+        - Also, adding `example`, `description`, and `label` on Yup objects is valid for Swagger API documentation but are not actual attributes on Yup objects, so test fail.
    - Configuring Swagger UI for API documentation was challenging
 
 - **ESLint Configuration in VSCode**:
