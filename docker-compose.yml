@@ -1,0 +1,18 @@
+version: '3.1'
+
+services:
+  app:
+    container_name: banking-app
+    build:
+      context: .
+    command: npm run start
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./transfers.db:/usr/src/app/transfers.db
+
+  test:
+    container_name: banking-app-test
+    build:
+      context: .
+    command: npm run test -- --verbose
