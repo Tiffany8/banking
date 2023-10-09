@@ -1,11 +1,22 @@
 import { type FastifyInstance } from 'fastify'
+
 import { buildTestFastifyInstance } from '../testSetup'
 
 describe('hello endpoint', () => {
   let app: FastifyInstance
 
-  beforeEach(() => {
-    app = buildTestFastifyInstance()
+  beforeEach(async () => {
+    app = await buildTestFastifyInstance()
+  })
+
+  afterEach((done) => {
+    app.db.close((err) => {
+      if (err !== null) {
+        done(err)
+      } else {
+        done()
+      }
+    })
   })
 
   it('should greet the world', async () => {
