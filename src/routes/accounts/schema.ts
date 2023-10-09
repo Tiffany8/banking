@@ -1,7 +1,7 @@
 import * as y from 'yup'
 
 export const CreateAccountRequestBody = y.object({
-  customer_id: y.string().required(),
+  customer_id: y.number().required(),
   account_number: y.string().required(),
   routing_number: y
     .string()

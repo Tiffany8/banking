@@ -10,7 +10,8 @@ import { type TTransfer } from '../../types/transfers'
 
 import {
   GetTransferByIdRequestParams,
-  TGetTransferByIdRequest,
+  GetTransfersRequestParams,
+  type TGetTransferByIdRequest,
   type TGetTransfersRequest
 } from './schema'
 
@@ -25,15 +26,23 @@ export default async (
   fastify.get<{
     Querystring: TGetTransfersRequest
     Reply: TTransfer[]
-  }>('/', async (request, reply) => {
-    const { limit, offset } = request.query
-    const transfers = await transferlib.getTransfers({
-      db: fastify.db,
-      limit,
-      offset
-    })
-    return transfers
-  })
+  }>(
+    '/',
+    {
+      schema: {
+        querystring: GetTransfersRequestParams
+      }
+    },
+    async (request, reply) => {
+      const { limit, offset } = request.query
+      const transfers = await transferlib.getTransfers({
+        db: fastify.db,
+        limit,
+        offset
+      })
+      return transfers
+    }
+  )
 
   fastify.get<{
     Params: TGetTransferByIdRequest

@@ -1,33 +1,53 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 import { type Database } from 'sqlite3'
-import { type TTransfer } from '../types/transfers'
-import { TAccount } from '../types/accounts'
+
+import { type TAccount } from '../types/accounts'
+import { APIError } from '../types/errors'
 
 const insertAccount: ({
   db,
-  customer_id,
-  account_number,
-  routing_number
+  customerId,
+  accountNumber,
+  routingNumber
 }: {
   db: Database
-  customer_id: string
-  account_number: string
-  routing_number: string
-}) => Promise<TAccount> = ({
+  customerId: number
+  accountNumber: string
+  routingNumber: string
+}) => Promise<TAccount> = async ({
   db,
-  customer_id,
-  account_number,
-  routing_number
+  customerId,
+  accountNumber,
+  routingNumber
 }): Promise<TAccount> => {
-  return new Promise((resolve, reject) => {
-    db.all(
-      'SELECT transfers.*, CONCAT(source.first_name, " ", source.last_name) AS source_customer_name, CONCAT(dest.first_name, " ", dest.last_name) AS destination_customer_name FROM transfers INNER JOIN customers source ON transfers.source_account_id = source.id INNER JOIN customers dest ON transfers.dest_account_id = dest.id LIMIT ? OFFSET ?',
-      [offset, limit],
-      (err: Error | null, rows: TTransfer[]) => {
+  return await new Promise((resolve, reject) => {
+    db.get(
+      'SELECT * FROM customers WHERE id = ?',
+      [customerId],
+      (err: Error | null, row?: TAccount) => {
         if (err !== null) {
-          reject(err)
+          reject(APIError(500, err.message))
+        } else if (row === undefined) {
+          reject(APIError(404, `Customer ${customerId} not found`))
         } else {
-          resolve(rows)
+          db.run(
+            'INSERT INTO accounts (customer_id, account_number, routing_number) VALUES (?, ?, ?)',
+            [customerId, accountNumber, routingNumber],
+            function (this: { lastID?: number | null }, err: Error | null) {
+              if (err !== null) {
+                reject(APIError(500, err.message))
+              } else if (this?.lastID === undefined || this?.lastID === null) {
+                reject(APIError(500, 'No lastID returned'))
+              } else {
+                resolve({
+                  id: this.lastID,
+                  customer_id: customerId,
+                  account_number: accountNumber,
+                  routing_number: routingNumber
+                })
+              }
+            }
+          )
         }
       }
     )

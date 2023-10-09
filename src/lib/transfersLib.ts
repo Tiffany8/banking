@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 import { type Database } from 'sqlite3'
+
+import { APIError } from '../types/errors'
 import { type TTransfer } from '../types/transfers'
 
 const getTransfers: ({
@@ -13,11 +15,20 @@ const getTransfers: ({
 }) => Promise<TTransfer[]> = ({ db, offset, limit }): Promise<TTransfer[]> => {
   return new Promise((resolve, reject) => {
     db.all(
-      'SELECT transfers.*, CONCAT(source.first_name, " ", source.last_name) AS source_customer_name, CONCAT(dest.first_name, " ", dest.last_name) AS destination_customer_name FROM transfers INNER JOIN customers source ON transfers.source_account_id = source.id INNER JOIN customers dest ON transfers.dest_account_id = dest.id LIMIT ? OFFSET ?',
-      [offset, limit],
+      `
+      SELECT transfers.id, transfers.timestamp, transfers.amount, transfers.status, transfers.source_account_id, transfers.dest_account_id,
+      cs.first_name || " " || cs.last_name AS source_account_name,
+      cd.first_name || " " || cd.last_name AS dest_account_name
+      FROM transfers
+      INNER JOIN accounts AS source ON transfers.source_account_id = source.id
+      INNER JOIN accounts AS dest ON transfers.dest_account_id = dest.id
+      INNER JOIN customers AS cs ON source.customer_id =  cs.id 
+      INNER JOIN customers AS cd ON dest.customer_id = cd.id
+      LIMIT ? OFFSET ?`,
+      [limit, offset],
       (err: Error | null, rows: TTransfer[]) => {
         if (err !== null) {
-          reject(err)
+          reject(APIError(500, err.message))
         } else {
           resolve(rows)
         }
@@ -35,15 +46,25 @@ const getTransferById: ({
 }) => Promise<TTransfer | null> = ({ db, id }): Promise<TTransfer | null> => {
   return new Promise((resolve, reject) => {
     db.get(
-      'SELECT transfers.*, CONCAT(source.first_name, " ", source.last_name) AS source_customer_name, CONCAT(dest.first_name, " ", dest.last_name) AS destination_customer_name FROM transfers INNER JOIN customers source ON transfers.source_account_id = source.id INNER JOIN customers dest ON transfers.dest_account_id = dest.id WHERE id = ?',
+      `
+      SELECT transfers.id, transfers.timestamp, transfers.amount, transfers.status, transfers.source_account_id, transfers.dest_account_id,
+      cs.first_name || " " || cs.last_name AS source_account_name,
+      cd.first_name || " " || cd.last_name AS dest_account_name
+      FROM transfers
+      INNER JOIN accounts AS source ON transfers.source_account_id = source.id
+      INNER JOIN accounts AS dest ON transfers.dest_account_id = dest.id
+      INNER JOIN customers AS cs ON source.customer_id =  cs.id 
+      INNER JOIN customers AS cd ON dest.customer_id = cd.id
+      WHERE transfers.id = ?
+      `,
       [id],
       (err: Error | null, row?: TTransfer) => {
         if (err !== null) {
-          reject(new Error(`Error retrieving row: ${err.message}`))
+          reject(APIError(500, `Error retrieving row: ${err.message}`))
         } else if (row !== undefined) {
           resolve(row)
         } else {
-          resolve(null)
+          reject(APIError(404, `Transfer ${id} not found`))
         }
       }
     )
